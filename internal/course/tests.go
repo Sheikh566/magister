@@ -450,6 +450,7 @@ func testStaticFiles(ctx context.Context, spec magister.RunnerConfig) error {
 	if err != nil {
 		return err
 	}
+	dir = filepath.Clean(dir)
 	defer os.RemoveAll(dir)
 
 	filename := "hello.txt"

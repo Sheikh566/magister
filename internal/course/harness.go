@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 	"time"
 
@@ -33,17 +34,20 @@ type managedServer struct {
 }
 
 func (h *Harness) start(ctx context.Context, extraEnv []string) (*managedServer, error) {
+	if err := waitForPortFree(ctx, h.spec.Host, h.spec.Port); err != nil {
+		return nil, err
+	}
+
 	shell, shellArgs := shellCommand(h.spec.Command)
 	cmd := exec.CommandContext(ctx, shell, shellArgs...)
 	setupProcessGroup(cmd)
+	setCmdLine(cmd, h.spec.Command)
 	cmd.Env = append(os.Environ(),
 		fmt.Sprintf("PORT=%d", h.spec.Port),
 		fmt.Sprintf("HTTP_SERVER_PORT=%d", h.spec.Port),
 		fmt.Sprintf("COURSE_PORT=%d", h.spec.Port),
 	)
 	cmd.Env = append(cmd.Env, extraEnv...)
-	cmd.Stdout = &bytes.Buffer{}
-	cmd.Stderr = &bytes.Buffer{}
 
 	srv := &managedServer{
 		spec: h.spec,
@@ -104,8 +108,10 @@ func (s *managedServer) stop() error {
 		return nil
 	}
 
-	// Kill the entire process group so child processes (e.g. "go run" -> server)
-	// are terminated. Otherwise the server can survive and hold port 5000.
+	// Kill the entire process tree so child processes (e.g. "go run" -> server)
+	// are terminated. Otherwise the server can survive and hold the port.
+	// On Unix this sends SIGTERM to the process group; on Windows this uses
+	// taskkill /F /T to recursively kill the process tree.
 	killProcessGroup(s.cmd)
 
 	select {
@@ -128,6 +134,26 @@ func (s *managedServer) addr() string {
 
 func (s *managedServer) outputString() string {
 	return strings.TrimSpace(s.output.String())
+}
+
+func waitForPortFree(ctx context.Context, host string, port int) error {
+	addr := fmt.Sprintf("%s:%d", host, port)
+	deadline := time.After(3 * time.Second)
+	for {
+		conn, err := net.DialTimeout("tcp", addr, 150*time.Millisecond)
+		if err != nil {
+			return nil // port is free
+		}
+		_ = conn.Close()
+
+		select {
+		case <-ctx.Done():
+			return fmt.Errorf("port %d still in use: %w", port, ctx.Err())
+		case <-deadline:
+			return fmt.Errorf("port %d is already in use — a previous server may still be running", port)
+		case <-time.After(100 * time.Millisecond):
+		}
+	}
 }
 
 func (h *Harness) dial() (net.Conn, error) {
@@ -229,11 +255,18 @@ func wrapServerError(prefix string, err error, srv *managedServer) error {
 }
 
 func shellCommand(command string) (string, []string) {
+	// Do not use "exec" prefix: commands like "cd /path && go run ." would fail
+	// because exec tries to run "cd" (a shell builtin) as an executable.
+	if runtime.GOOS == "windows" {
+		comspec := strings.TrimSpace(os.Getenv("ComSpec"))
+		if comspec == "" {
+			comspec = `cmd.exe`
+		}
+		return comspec, []string{"/c", command}
+	}
 	shell := strings.TrimSpace(os.Getenv("SHELL"))
 	if shell == "" {
 		shell = "sh"
 	}
-	// Do not use "exec" prefix: commands like "cd /path && go run ." would fail
-	// because exec tries to run "cd" (a shell builtin) as an executable.
 	return shell, []string{"-c", command}
 }

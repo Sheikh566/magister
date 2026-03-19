@@ -11,6 +11,8 @@ func setupProcessGroup(cmd *exec.Cmd) {
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 }
 
+func setCmdLine(_ *exec.Cmd, _ string) {}
+
 func killProcessGroup(cmd *exec.Cmd) {
 	if cmd.Process == nil {
 		return
