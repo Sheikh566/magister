@@ -52,5 +52,5 @@ release:
   # If you want to automatically publish to GitHub, keep this true.
   # Otherwise, set to false to just build the archives locally in the dist/ folder.
   github:
-    owner: sheik # Replace with your actual GitHub username
+    owner: Sheikh566 # Replace with your actual GitHub username
     name: magister

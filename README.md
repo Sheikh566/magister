@@ -1,119 +1,99 @@
 # Magister
 
-Magister is a local course runner for black-box, implementation-driven systems projects.
+Magister is a local, implementation-driven learning environment for building systems. 
 
-It is designed for courses where:
+It is designed for developers who want to learn how complex systems work under the hood by building them from scratch. Magister provides the curriculum and an automated black-box testing engine, while you provide the code in whatever language or architecture you prefer.
 
-- lessons define observable behavior only
-- you keep full control over architecture and code structure
-- tests are run from the outside against your program
-- progress is stored per lesson as `passed`, `failed`, or `not attempted`
+> ⚠️ **Disclaimer:** This project was completely *vibe-coded* (AI-generated) and is currently in its initial phase. You may encounter bugs, edge cases in tests, or rough edges in the UI. Please open an issue if you run into any problems!
 
-The first course included here is:
+## Included Courses
 
-- `http-server` — Build Your Own HTTP Server
+* **Build Your Own HTTP Server** (`http-server`)
+  * Start with raw TCP sockets and progressively implement routing, header parsing, connection keep-alive, and concurrency. 
 
-The codebase is generic enough to add more courses later, such as Redis or SQLite tracks, without redesigning the app.
+**Looking for Contributors:** The Magister engine is designed to be completely generic. I am actively looking for contributors to help add more courses (e.g., *Build Your Own Redis*, *Build Your Own SQLite*, *Build Your Own Git*). If you're interested in writing test harnesses and markdown lessons, please reach out!
 
-## What Magister provides
+---
 
-- a Go CLI for browsing courses and running lesson tests
-- a local web UI for course browsing and progress tracking
-- persistent runner settings and lesson status in `.magister/state.json`
-- course definitions that describe behavior, not solutions
+## How it works
 
-## CLI
+1. **Pick a course:** Browse the available courses and read the lesson requirements.
+2. **Write your code:** Build the target application in your preferred language (Python, Go, Rust, Node, etc.).
+3. **Run the tests:** Tell Magister how to start your server. Magister will boot your process, fire real network requests against it, and validate the responses to ensure they meet the protocol specification.
 
-List courses:
+## Installation
 
+### Download Pre-compiled Binaries (Recommended)
+
+Magister is distributed as a single, standalone binary. You don't need Go or any other dependencies installed to run it.
+
+1. Go to the [Releases page](https://github.com/sheikh566/magister/releases).
+2. Download the archive for your operating system and architecture.
+3. Extract the archive.
+4. Move the `magister` binary to a folder in your `$PATH` (e.g., `/usr/local/bin` on Mac/Linux).
+
+### Install via Go
+If you already have Go 1.25+ installed on your system, you can build and install the latest version directly:
 ```bash
-go run ./cmd/magister courses
+go install github.com/sheikh566/magister/cmd/magister@latest
 ```
 
-List lessons for the HTTP course:
+---
+
+## Usage
+
+Magister provides both a modern Web UI and a fast CLI. Your progress is saved locally in a `.magister/state.json` file in whatever directory you run the command from.
+
+### Web UI
+
+The easiest way to use Magister is through the web interface. Run this command inside the directory where you are writing your code:
 
 ```bash
-go run ./cmd/magister lessons http-server
+magister serve
 ```
 
-Show a lesson:
+Then open `http://127.0.0.1:8787` in your browser. From here, you can read the lessons, configure your runner (e.g., tell it to run `python3 server.py`), and execute tests with a click of a button.
 
+### CLI
+
+If you prefer staying in the terminal, the CLI is fully featured:
+
+**List courses:**
 ```bash
-go run ./cmd/magister show http-server http-01
+magister courses
 ```
 
-Run one test:
-
+**List lessons for a course:**
 ```bash
-go run ./cmd/magister test http-server tcp-01 --cmd "go run server.go"
+magister lessons http-server
 ```
 
-Run all tests:
-
+**Show a specific lesson's requirements:**
 ```bash
-go run ./cmd/magister test http-server all --cmd "go run server.go"
+magister show http-server http-01
 ```
 
-You can override connection details when needed:
-
+**Run the test for a specific lesson:**
 ```bash
-go run ./cmd/magister test http-server http-07 \
-  --cmd "go run server.go" \
-  --host 127.0.0.1 \
-  --port 8080 \
-  --startup-timeout 10s \
-  --request-timeout 3s
+magister test http-server tcp-01 --cmd "python3 my_server.py"
 ```
 
-The runner stores these settings for the course, so you do not need to pass them every time.
-
-## Web UI
-
-Start the local site:
-
+**Run all tests in a course at once:**
 ```bash
+magister test http-server all --cmd "python3 my_server.py"
+```
+
+*Note: Once you pass `--cmd` to the test runner once, Magister saves it to your local state. You don't need to pass it on subsequent runs unless your command changes.*
+
+## Local Development
+To run the project locally from source:
+```bash
+git clone https://github.com/sheikh566/magister.git
+cd magister
 go run ./cmd/magister serve
 ```
 
-Then open:
-
-```text
-http://127.0.0.1:8787
-```
-
-The UI includes:
-
-- a course home page
-- a lesson browser
-- per-lesson status badges
-- saved runner settings
-- lesson detail pages with contracts and raw wire examples
-- latest test output for each lesson
-
-## Current HTTP course
-
-Course ID: `http-server`
-
-Lessons:
-
-1. `tcp-01` Accept one TCP connection
-2. `http-01` Return a minimal HTTP response
-3. `http-02` Route root and unknown paths
-4. `http-03` Echo one path segment
-5. `http-04` Echo the request body
-6. `http-05` Read a request header
-7. `http-06` Reuse one TCP connection
-8. `http-07` Stay responsive while slow clients are connected
-9. `http-08` Support `HEAD`
-10. `http-09` Reject malformed requests
-11. `http-10` Serve files from a directory
-
-Each lesson stays at the black-box level. The course tells you what your server must do, not how to implement it.
-
-## Verification
-
-The core packages and web routes were verified with:
-
+To run the internal verification tests:
 ```bash
-env GOCACHE=/tmp/go-build go test ./cmd/magister ./internal/magister ./internal/course
+go test ./...
 ```
