@@ -25,3 +25,4 @@ magister
 
 # GoReleaser output
 dist/
+.envrc
