@@ -10,6 +10,7 @@ It is designed for developers who want to learn how complex systems work under t
 
 * **Build Your Own HTTP Server** (`http-server`)
   * Start with raw TCP sockets and progressively implement routing, header parsing, connection keep-alive, and concurrency. 
+  * *Stuck? Check out a complete solution written in Go: [magister-http-server.go](https://gist.github.com/Sheikh566/96aa020ac19a4258779ea118213ca1bd).*
 
 **Looking for Contributors:** The Magister engine is designed to be completely generic. I am actively looking for contributors to help add more courses (e.g., *Build Your Own Redis*, *Build Your Own SQLite*, *Build Your Own Git*). If you're interested in writing test harnesses and markdown lessons, please reach out!
 
