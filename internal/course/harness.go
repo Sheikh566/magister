@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"runtime"
 	"strings"
 	"time"
 
@@ -36,6 +35,7 @@ type managedServer struct {
 func (h *Harness) start(ctx context.Context, extraEnv []string) (*managedServer, error) {
 	shell, shellArgs := shellCommand(h.spec.Command)
 	cmd := exec.CommandContext(ctx, shell, shellArgs...)
+	setupProcessGroup(cmd)
 	cmd.Env = append(os.Environ(),
 		fmt.Sprintf("PORT=%d", h.spec.Port),
 		fmt.Sprintf("HTTP_SERVER_PORT=%d", h.spec.Port),
@@ -104,21 +104,13 @@ func (s *managedServer) stop() error {
 		return nil
 	}
 
-	if runtime.GOOS != "windows" {
-		if s.cmd.Process != nil {
-			_ = s.cmd.Process.Kill()
-		}
-	} else {
-		if s.cmd.Process != nil {
-			_ = s.cmd.Process.Kill()
-		}
-	}
+	// Kill the entire process group so child processes (e.g. "go run" -> server)
+	// are terminated. Otherwise the server can survive and hold port 5000.
+	killProcessGroup(s.cmd)
 
 	select {
 	case <-time.After(500 * time.Millisecond):
-		if s.cmd.Process != nil {
-			_ = s.cmd.Process.Kill()
-		}
+		killProcessGroupForce(s.cmd)
 		select {
 		case <-time.After(500 * time.Millisecond):
 			return fmt.Errorf("timed out waiting for server process to stop")

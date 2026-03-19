@@ -18,7 +18,7 @@
 go.work
 
 # Ignore Magister local state
-.magister/
+.magister/*
 
 # Ignore magister binary (built locally)
 magister
