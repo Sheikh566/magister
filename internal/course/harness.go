@@ -13,7 +13,6 @@ import (
 	"os/exec"
 	"runtime"
 	"strings"
-	"syscall"
 	"time"
 
 	"magister/internal/magister"
@@ -37,9 +36,6 @@ type managedServer struct {
 func (h *Harness) start(ctx context.Context, extraEnv []string) (*managedServer, error) {
 	shell, shellArgs := shellCommand(h.spec.Command)
 	cmd := exec.CommandContext(ctx, shell, shellArgs...)
-	if runtime.GOOS != "windows" {
-		cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-	}
 	cmd.Env = append(os.Environ(),
 		fmt.Sprintf("PORT=%d", h.spec.Port),
 		fmt.Sprintf("HTTP_SERVER_PORT=%d", h.spec.Port),
@@ -109,16 +105,18 @@ func (s *managedServer) stop() error {
 	}
 
 	if runtime.GOOS != "windows" {
-		_ = syscall.Kill(-s.cmd.Process.Pid, syscall.SIGINT)
+		if s.cmd.Process != nil {
+			_ = s.cmd.Process.Kill()
+		}
 	} else {
-		_ = s.cmd.Process.Signal(os.Interrupt)
+		if s.cmd.Process != nil {
+			_ = s.cmd.Process.Kill()
+		}
 	}
 
 	select {
 	case <-time.After(500 * time.Millisecond):
-		if runtime.GOOS != "windows" {
-			_ = syscall.Kill(-s.cmd.Process.Pid, syscall.SIGKILL)
-		} else {
+		if s.cmd.Process != nil {
 			_ = s.cmd.Process.Kill()
 		}
 		select {
