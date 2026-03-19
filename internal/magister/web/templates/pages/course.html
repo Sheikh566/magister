@@ -1,0 +1,35 @@
+{{define "course"}}
+  {{template "base-start" .}}
+  <div class="crumbs"><a href="/">Courses</a> / <span>{{.Course.Title}}</span></div>
+  <h1>{{.Course.Title}}</h1>
+  <p class="lede">{{.Course.Description}}</p>
+  {{template "notice" .Notice}}
+  <div class="two-col page-space-md">
+    <div class="stack">
+      <div class="card stack">
+        <div class="topline">
+          <h3>Lessons</h3>
+          <div class="badge {{.SummaryStatusClass}}">{{.Passed}} / {{.Total}} passed</div>
+        </div>
+        <p class="meta">{{.Course.Summary}}</p>
+        <div class="progress"><span style="width: {{progressPercent .Passed .Total}}%;"></span></div>
+        <div class="grid lesson-grid">
+          {{range .Lessons}}
+            {{template "lesson-card" .}}
+          {{end}}
+        </div>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="card stack">
+        <h3>Runner</h3>
+        <p class="meta">The Magister Runner automatically starts your server process, sends real HTTP requests over the network, and validates the responses against the lesson requirements. Configure how Magister should execute and connect to your server below.</p>
+        {{template "runner-form" .}}
+        <form class="inline" method="post" action="/courses/{{.Course.ID}}/test/all">
+          <button type="submit">Run all lessons</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {{template "base-end" .}}
+{{end}}

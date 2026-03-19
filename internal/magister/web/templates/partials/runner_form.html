@@ -1,0 +1,24 @@
+{{define "runner-form"}}
+<form class="stack" method="post" action="/courses/{{.Course.ID}}/config">
+  <label>Server command
+    <input type="text" name="command" value="{{.Runner.Command}}" placeholder="{{.CommandHint}}">
+  </label>
+  <div class="config-grid">
+    <label>Host
+      <input type="text" name="host" value="{{.Runner.Host}}">
+    </label>
+    <label>Port
+      <input type="text" name="port" value="{{.Runner.Port}}">
+    </label>
+    <label>Startup timeout
+      <input type="text" name="startup_timeout" value="{{.Runner.StartupTimeout}}">
+    </label>
+    <label>Request timeout
+      <input type="text" name="request_timeout" value="{{.Runner.RequestTimeout}}">
+    </label>
+  </div>
+  <div class="actions">
+    <button type="submit" class="secondary">Save settings</button>
+  </div>
+</form>
+{{end}}

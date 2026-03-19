@@ -1,0 +1,24 @@
+{{define "lesson-card"}}
+<div class="card">
+  <div class="card-banner" style="background-color: #E5F0FF; color: #003380;">
+    Lesson &bull; {{.Chapter}}
+  </div>
+  <div class="card-body">
+    <h3><a href="/courses/{{.CourseID}}/lessons/{{.ID}}">{{.ID}} {{.Title}}</a></h3>
+    <p class="desc">{{.Summary}}</p>
+  </div>
+  <div class="card-footer">
+    <div class="card-footer-inner">
+      <div class="card-footer-meta">
+        <span class="badge {{statusClass .Status}}">{{.Status}}</span>
+      </div>
+    </div>
+    <div class="actions" style="margin-top: 20px;">
+      <a class="button secondary" href="/courses/{{.CourseID}}/lessons/{{.ID}}">Open lesson</a>
+      <form class="inline" method="post" action="/courses/{{.CourseID}}/test/{{.ID}}">
+        <button type="submit">Run test</button>
+      </form>
+    </div>
+  </div>
+</div>
+{{end}}

@@ -1,0 +1,81 @@
+{{define "lesson"}}
+  {{template "base-start" .}}
+  <div class="crumbs"><a href="/">Courses</a> / <a href="/courses/{{.Course.ID}}">{{.Course.Title}}</a> / <span>{{.Lesson.ID}}</span></div>
+  <h1>{{.Lesson.Title}}</h1>
+  <p class="lede">{{.Lesson.Summary}}</p>
+  {{template "notice" .Notice}}
+  <div class="two-col page-space-md">
+    <div class="stack">
+      {{if .MarkdownContent}}
+      <div class="card stack markdown-content">
+        {{.MarkdownContent}}
+      </div>
+      {{end}}
+      <div class="card stack">
+        <div class="topline">
+          <div class="meta">{{.Lesson.Chapter}} · {{.Lesson.ID}}</div>
+          <div class="badge {{statusClass .Status}}">{{.Status}}</div>
+        </div>
+        <h3>Observable contract</h3>
+        <ul>
+          {{range .Lesson.Objectives}}<li>{{.}}</li>{{end}}
+        </ul>
+        <h3 class="section-gap">Test Focus</h3>
+        <ul>
+          {{range .Lesson.TestFocus}}<li>{{.}}</li>{{end}}
+        </ul>
+        {{if .Lesson.WireText}}
+          <h3 class="section-gap">Raw wire text</h3>
+          <pre>{{.Lesson.WireText}}</pre>
+        {{end}}
+      </div>
+      {{if .LastOutput}}
+      <div id="latest-output" class="card stack">
+        <h3>Latest output</h3>
+        <pre>{{.LastOutput}}</pre>
+      </div>
+      {{end}}
+    </div>
+    <div class="stack">
+      <div class="card stack">
+        <h3>Test status</h3>
+        <div class="badge {{statusClass .Status}}">{{.Status}}</div>
+        <div class="meta">{{.LastRunText}}</div>
+        <div class="actions">
+          <form class="inline" method="post" action="/courses/{{.Course.ID}}/test/{{.Lesson.ID}}">
+            <button type="submit">Run lesson test</button>
+          </form>
+          <a class="button secondary" href="/courses/{{.Course.ID}}">Back to course</a>
+        </div>
+      </div>
+      <div class="card stack">
+        <div class="topline" style="margin-bottom: 0;">
+          <h3>Server Target</h3>
+          <a href="/courses/{{.Course.ID}}" class="meta">Edit</a>
+        </div>
+        <div class="meta">Command: {{if .Runner.Command}}{{.Runner.Command}}{{else}}not configured{{end}}</div>
+        <div class="meta">Address: {{.Runner.Host}}:{{.Runner.Port}}</div>
+        <div class="meta">Timeouts: start {{.Runner.StartupTimeout}} · request {{.Runner.RequestTimeout}}</div>
+      </div>
+      
+      <div class="card stack">
+        <div class="topline" style="margin-bottom: 0;">
+          {{if .PrevLesson}}
+          <a href="/courses/{{.Course.ID}}/lessons/{{.PrevLesson.ID}}" class="button secondary" style="flex: 1; text-align: center;">&larr; Previous</a>
+          {{else}}
+          <div style="flex: 1;"></div>
+          {{end}}
+          
+          <div style="width: 16px;"></div>
+          
+          {{if .NextLesson}}
+          <a href="/courses/{{.Course.ID}}/lessons/{{.NextLesson.ID}}" class="button" style="flex: 1; text-align: center;">Next &rarr;</a>
+          {{else}}
+          <div style="flex: 1;"></div>
+          {{end}}
+        </div>
+      </div>
+    </div>
+  </div>
+  {{template "base-end" .}}
+{{end}}

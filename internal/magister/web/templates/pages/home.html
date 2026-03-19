@@ -1,0 +1,11 @@
+{{define "home"}}
+  {{template "base-start" .}}
+  <h1>Learn Systems by Building Them.</h1>
+  <p class="lede">Magister is your local, implementation-driven learning environment. Choose a course, write code in any language, and let Magister's automated testing engine validate your progress step by step.</p>
+  <div class="grid course-grid page-space-lg">
+    {{range .Courses}}
+      {{template "course-card" .}}
+    {{end}}
+  </div>
+  {{template "base-end" .}}
+{{end}}

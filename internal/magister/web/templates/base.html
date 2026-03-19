@@ -1,0 +1,25 @@
+{{define "base-start"}}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.Title}}</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div class="masthead">
+    <div class="masthead-inner">
+      <div class="brand"><a href="/">Magister</a></div>
+    </div>
+  </div>
+  <div class="shell">
+    <main>
+{{end}}
+
+{{define "base-end"}}
+    </main>
+  </div>
+</body>
+</html>
+{{end}}

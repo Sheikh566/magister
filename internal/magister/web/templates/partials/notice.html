@@ -1,0 +1,8 @@
+{{define "notice"}}
+  {{if .}}
+  <div class="notice" style="display: flex; justify-content: space-between; align-items: center;">
+    <div>{{.}}</div>
+    <a href="#latest-output" style="white-space: nowrap; font-weight: 600; text-decoration: underline;">See logs</a>
+  </div>
+  {{end}}
+{{end}}
