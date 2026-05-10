@@ -354,14 +354,6 @@ func dnsARecord(name, ip string, ttl uint32) dnsRecord {
 	return dnsRecord{Name: name, Type: dnsTypeA, Class: dnsClassIN, TTL: ttl, Data: []byte(parsed)}
 }
 
-func dnsAAAARecord(name, ip string, ttl uint32) dnsRecord {
-	parsed := net.ParseIP(ip).To16()
-	if parsed == nil {
-		panic(fmt.Sprintf("invalid IPv6 address %q", ip))
-	}
-	return dnsRecord{Name: name, Type: dnsTypeAAAA, Class: dnsClassIN, TTL: ttl, Data: []byte(parsed)}
-}
-
 func dnsNSRecord(name, target string, ttl uint32) dnsRecord {
 	return dnsRecord{Name: name, Type: dnsTypeNS, Class: dnsClassIN, TTL: ttl, Data: encodeDNSName(target)}
 }
