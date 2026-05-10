@@ -1,5 +1,7 @@
 package course
 
+// DNS wire-format helpers, UDP/TCP exchange, and fake servers for dns_tests.
+
 import (
 	"context"
 	"crypto/rand"

@@ -1,5 +1,7 @@
 package course
 
+// Black-box tests for the dns-server course (lesson Run functions).
+
 import (
 	"context"
 	"encoding/binary"
