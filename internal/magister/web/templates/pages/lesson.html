@@ -3,7 +3,7 @@
   <div class="crumbs"><a href="/">Courses</a> / <a href="/courses/{{.Course.ID}}">{{.Course.Title}}</a> / <span>{{.Lesson.ID}}</span></div>
   <h1>{{.Lesson.Title}}</h1>
   <p class="lede">{{.Lesson.Summary}}</p>
-  {{template "notice" .Notice}}
+  {{template "notice" .}}
   <div class="two-col page-space-md">
     <div class="stack">
       {{if .MarkdownContent}}
