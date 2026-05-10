@@ -38,6 +38,12 @@ func (h *Harness) start(ctx context.Context, extraEnv []string) (*managedServer,
 		return nil, err
 	}
 
+	return h.startWithReady(ctx, extraEnv, func(srv *managedServer) error {
+		return srv.waitForReady(ctx)
+	})
+}
+
+func (h *Harness) startWithReady(ctx context.Context, extraEnv []string, ready func(*managedServer) error) (*managedServer, error) {
 	shell, shellArgs := shellCommand(h.spec.Command)
 	cmd := exec.CommandContext(ctx, shell, shellArgs...)
 	setupProcessGroup(cmd)
@@ -45,6 +51,7 @@ func (h *Harness) start(ctx context.Context, extraEnv []string) (*managedServer,
 	cmd.Env = append(os.Environ(),
 		fmt.Sprintf("PORT=%d", h.spec.Port),
 		fmt.Sprintf("HTTP_SERVER_PORT=%d", h.spec.Port),
+		fmt.Sprintf("DNS_SERVER_PORT=%d", h.spec.Port),
 		fmt.Sprintf("COURSE_PORT=%d", h.spec.Port),
 	)
 	cmd.Env = append(cmd.Env, extraEnv...)
@@ -65,7 +72,7 @@ func (h *Harness) start(ctx context.Context, extraEnv []string) (*managedServer,
 		srv.done <- cmd.Wait()
 	}()
 
-	if err := srv.waitForReady(ctx); err != nil {
+	if err := ready(srv); err != nil {
 		_ = srv.stop()
 		return nil, err
 	}
