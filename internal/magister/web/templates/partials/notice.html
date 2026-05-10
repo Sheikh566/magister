@@ -1,8 +1,10 @@
 {{define "notice"}}
-  {{if .}}
+  {{if .Notice}}
   <div class="notice" style="display: flex; justify-content: space-between; align-items: center;">
-    <div>{{.}}</div>
+    <div>{{.Notice}}</div>
+    {{if .LastOutput}}
     <a href="#latest-output" style="white-space: nowrap; font-weight: 600; text-decoration: underline;">See logs</a>
+    {{end}}
   </div>
   {{end}}
 {{end}}

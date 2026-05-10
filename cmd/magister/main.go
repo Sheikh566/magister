@@ -15,7 +15,10 @@ import (
 )
 
 func main() {
-	registry := magister.NewRegistry(httpcourse.HTTPServerCourse())
+	registry := magister.NewRegistry(
+		httpcourse.HTTPServerCourse(),
+		httpcourse.DNSServerCourse(),
+	)
 	store := magister.NewStore(".")
 	os.Exit(run(registry, store, os.Args[1:], os.Stdout, os.Stderr))
 }

@@ -1,5 +1,7 @@
 package course
 
+// Black-box tests for the http-server course (lesson Run functions).
+
 import (
 	"bufio"
 	"context"
@@ -134,7 +136,7 @@ func testEchoPath(ctx context.Context, spec magister.RunnerConfig) error {
 	}
 	want := hex.EncodeToString(bytes)
 	path := fmt.Sprintf("/echo/%s", want)
-	
+
 	resp, body, err := h.exchange(fmt.Sprintf("GET %s HTTP/1.1\r\nHost: localhost\r\n\r\n", path))
 	if err != nil {
 		return wrapServerError(fmt.Sprintf("request to %s", path), err, srv)

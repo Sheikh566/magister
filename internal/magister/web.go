@@ -49,6 +49,7 @@ type coursePageData struct {
 	Failed             int
 	Total              int
 	Notice             string
+	LastOutput         string
 	CommandHint        string
 	SummaryStatusClass string
 }
