@@ -4,8 +4,6 @@ Magister is a local, implementation-driven learning environment for building sys
 
 It is designed for developers who want to learn how complex systems work under the hood by building them from scratch. Magister provides the curriculum and an automated black-box testing engine, while you provide the code in whatever language or architecture you prefer.
 
-> ⚠️ **Disclaimer:** This project was completely *vibe-coded* (AI-generated) and is currently in its initial phase. You may encounter bugs, edge cases in tests, or rough edges in the UI. Please open an issue if you run into any problems!
-
 ## Included Courses
 
 * **Build Your Own HTTP Server** (`http-server`)
